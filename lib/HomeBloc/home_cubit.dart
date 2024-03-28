@@ -10,8 +10,12 @@ class HomeCubit extends Cubit<HomeState> {
   HomeCubit() : super(HomeLoading());
 
   void addData(String welcomeJson) {
+    print("emited");
     print("setting data");
     data = welcomeFromJson(welcomeJson);
+    print("emited");
+
     emit(HomeNew(data: data));
+    print("emited");
   }
 }

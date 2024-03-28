@@ -38,12 +38,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     fetchMovies() async {
       final response = await dio.get(
-          'https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=6c1b29a0638d7b468a2d8177af8cad53');
-
+          'https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=fa3e844ce31744388e07fa47c7c5d8c3');
       context.read<HomeCubit>().addData(response.toString());
     }
 
-    fetchMovies();
+    //fetchMovies();
 
     return Scaffold(
         key: _scaffoldKey,

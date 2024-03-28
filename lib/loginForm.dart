@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_app/HomeBloc/homePage.dart';
 
@@ -15,8 +18,52 @@ class _LoginFormState extends State<LoginForm> {
   GlobalKey<FormState> _signInKey = GlobalKey();
   TextEditingController _passController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
+
+  //auth
   final RegExp emailValid =
       RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+
+  LocalAuthentication localAuth = LocalAuthentication();
+  _SupportState supportState = _SupportState.unknown;
+
+  Future<void> _checkBiometrics() async {
+    bool canCheckBiometrics;
+    try {
+      canCheckBiometrics = await localAuth.canCheckBiometrics;
+    } on PlatformException catch (e) {
+      print("Error checking biometrics: $e");
+      return;
+    }
+
+    setState(() {
+      supportState = canCheckBiometrics
+          ? _SupportState.supported
+          : _SupportState.unsupported;
+    });
+
+    if (canCheckBiometrics) {
+      // You can now authenticate using biometrics
+      try {
+        bool authenticated = await localAuth.authenticate(
+          localizedReason:
+              'Scan your fingerprint (or face or whatever) to authenticate',
+          options: const AuthenticationOptions(
+            stickyAuth: true,
+            biometricOnly: true,
+          ),
+        );
+        print(authenticated);
+        if (authenticated) {
+          navigateToHome();
+        } else {
+          // Handle authentication failure
+          // You may want to show a message to the user indicating that biometric authentication failed.
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
 
   navigateToHome() {
     Navigator.push(
@@ -39,9 +86,16 @@ class _LoginFormState extends State<LoginForm> {
   @override
   void initState() {
     super.initState();
+
     _prefs.then((SharedPreferences prefs) {
       var logged = prefs.getBool('logged') ?? false;
-      if (logged) {
+      var useBiometrics = prefs.getBool('useFingerPrint') ?? false;
+      if (!logged) {
+        return;
+      }
+      if (useBiometrics) {
+        _checkBiometrics();
+      } else {
         navigateToHome();
       }
     });
@@ -109,4 +163,10 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ])));
   }
+}
+
+enum _SupportState {
+  unknown,
+  supported,
+  unsupported,
 }
