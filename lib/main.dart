@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_app/counterBloc/counter.dart';
 import 'package:test_app/loginForm.dart';
-import 'package:test_app/registerForm.dart';
-import 'package:test_app/sum.dart';
 
 void main() {
   runApp(const MyApp());
