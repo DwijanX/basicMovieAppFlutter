@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
       context.read<HomeCubit>().addData(response.toString());
     }
 
-    //fetchMovies();
+    fetchMovies();
 
     return Scaffold(
         key: _scaffoldKey,
@@ -113,13 +113,20 @@ class MyListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print(items[0].posterPath);
     return ListView(
       children: items
           .map((item) => ListTile(
+                leading: Image.network(
+                  'https://image.tmdb.org/t/p/original/${item.posterPath}',
+                  width: 40, // Adjust the width as needed
+                  height: 40, // Adjust the height as needed
+                  fit: BoxFit.cover,
+                ),
                 title: Text(item.title),
                 onTap: () {
                   // Handle item tap here
-                  print('Tapped on $item');
+                  print('Tapped on ${item.title}');
                 },
               ))
           .toList(),
